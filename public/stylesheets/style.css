@@ -1,0 +1,91 @@
+nav {
+    padding: 0 0 20px;
+}
+
+.form-group {
+    padding: 50px 0 0;
+}
+
+.fleft {
+    float: left;
+    clear: left;
+}
+
+.fright {
+    float: right;
+    clear: right;
+}
+
+.board {
+    padding: 10px;
+    border-top: 1px solid #c3c3c3;
+}
+
+.board:first-of-type {
+    margin-top: 20px;
+}
+
+.board:last-of-type {
+    border-bottom: 1px solid #c3c3c3;
+}
+
+.customMargin {
+    margin: 10px 0px;
+}
+
+.outlayTotal > span,
+.outlayTotal > input {
+    color: green;
+    font-weight: bold;
+}
+
+.dayPanel label {
+    font-size: 150%;
+    color: gray;
+}
+
+.dayPanel .income {
+    font-size: 110%;
+    margin-left: 8%;
+    float: right;
+    color: green;
+}
+
+.dayPanel .outlay {
+    font-size: 110%;
+    margin-left: 8%;
+    float: right;
+    color: red;
+}
+
+.dayPanel .transfer{
+    font-size: 110%;
+    margin-left: 8%;
+    float: right;
+}
+
+.dayPanel .total {
+    font-size: 110%;
+    margin-left: 8%;
+    float: right;
+    color: gray;
+}
+
+.billPanel {
+    margin : 0 auto;
+    padding : 0 auto;
+    float: right;
+}
+
+.billPanel label.account{
+    font-size: 120%;
+    padding: 10px 0 0;
+    margin: 10px 0 0;
+}
+
+.billPanel span.account{
+    font-size: 120%;
+    padding: 10px 0 0;
+    margin: 10px 0 0;
+}
+

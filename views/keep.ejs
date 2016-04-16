@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>
+        <%= title %>
+    </title>
+    <link rel="stylesheet" type="text/css" href="/stylesheets/bootstrap.min.css" />
+    <link rel="stylesheet" type="text/css" href="/stylesheets/style.css" />
+    <link rel="stylesheet" type="text/css" href="/stylesheets/bootstrap-datetimepicker.min.css" />
+</head>
+
+<body onkeydown="backspace();">
+    <div class="container">
+        <div class="form-group">
+            <div class="col-md-6 col-md-offset-3 col-xs-12">
+                <nav>
+                    <ul class="nav nav-tabs nav-pills">
+                        <li class="active">
+                            <a href="#outlay">支出</a>
+                        </li>
+                        <li>
+                            <a href="#income">收入</a>
+                        </li>
+                        <li>
+                            <a href="#transfer">转账</a>
+                        </li>
+                        <li style="float:right">
+                            <a href="/" class="btn btn-link">取消</a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-md-6 col-md-offset-3 col-xs-12">
+                <div id="outlay" class="keepDetail">
+                    <form action="/keep" method="POST">
+                        <input type="hidden" name="outlay" value="outlay" />
+                        <input type="hidden" id="dtp_input_outlay" name="datetime" value="" />
+                        <div class="board accountPanel">
+                            <span>账户</span>
+                            <a type="button" class="btn" data-toggle="modal" data-target="#myAccountDialog" onclick="addAccountLock(this)"></a>
+                            <input type="hidden" name="parentAccountContent" class="parentAccountContent" value="">
+                            <input type="hidden" name="subAccountContent" class="subAccountContent" value="">
+                            <button type="button" class="btn btn-info" onclick="addOutlayItem()">增加一项</button>
+                            <fieldset disabled>
+                                <div class="input-group customMargin date form_datetime" data-date="" data-date-format="MMdd yyyy - hh:ii" data-link-field="dtp_input_outlay">
+                                    <input class="form-control" size="16" type="text" value="" readonly>
+                                    <span class="input-group-addon"><span class="glyphicon glyphicon-th"></span></span>
+                                </div>
+                                <div class="input-group outlayTotal">
+                                    <span class="input-group-addon">总计</span>
+                                    <input type="text" class="form-control text-right" placeholder="0" id="input_integer" onkeyup="checkInteger(this)" />
+                                    <span class="input-group-addon">.</span>
+                                    <input type="text" class="form-control" placeholder="00" id="input_decimal" onkeyup="checkDecimal(this)" />
+                                </div>
+                            </fieldset>
+                        </div>
+                        <div id="outlay_confirm">
+                            <button type="submit" class="btn btn-warning col-md-4 col-md-offset-1 col-xs-4 col-xs-offset-1" name="save">保存</button>
+                            <button type="submit" class="btn btn-default col-md-4 col-md-offset-2 col-xs-4 col-xs-offset-2" name="nextKeep">再记一笔</button>
+                        </div>
+                    </form>
+                </div>
+                <div id="income" class="keepDetail" style="display: none">
+                    <form action="/keep" method="POST">
+                        <input type="hidden" name="income" value="income" />
+                        <input type="hidden" id="dtp_input_income" name="datetime" value="" />
+                        <div class="board accountPanel">
+                            <span>账户</span>
+                            <a type="button" class="btn" data-toggle="modal" data-target="#myAccountDialog" onclick="addAccountLock(this);"></a>
+                            <input type="hidden" name="parentAccountContent" class="parentAccountContent" value="">
+                            <input type="hidden" name="subAccountContent" class="subAccountContent" value="">
+                            <fieldset disabled>
+                                <div class="input-group customMargin date form_datetime" data-date="" data-date-format="MMdd yyyy - hh:ii" data-link-field="dtp_input_income">
+                                    <input class="form-control" size="16" type="text" value="" readonly>
+                                    <span class="input-group-addon"><span class="glyphicon glyphicon-th"></span></span>
+                                </div>
+                            </fieldset>
+                        </div>
+                        <div class="board categoryPanel">
+                            <span>分类</span>
+                            <input type="hidden" class="categoryContent" name="item_category" value="" />
+                            <a type="button" class="btn" data-toggle="modal" data-target="#myCategoryDialog" onclick="addCategoryLock(this)"></a>
+                            <div class="has-feedback">
+                                <input type="number" min="0.01" step="0.01" class="customMargin form-control" name="item_amount" placeholder="请输入金额(00.00)" onkeyup="checkNumber(this);countNumber(this);" />
+                                <span class="glyphicon glyphicon-ok form-control-feedback" aria-hidden="true" />
+                            </div>
+                            <textarea rols="2" class="form-control" placeholder="备注" name="item_note"></textarea>
+                        </div>
+                        <div id="income_confirm">
+                            <button type="submit" class="btn btn-warning col-md-4 col-md-offset-1 col-xs-4 col-xs-offset-1" name="save">保存</button>
+                            <button type="submit" class="btn btn-default col-md-4 col-md-offset-2 col-xs-4 col-xs-offset-2" name="nextKeep">再记一笔</button>
+                        </div>
+                    </form>
+                </div>
+                <div id="transfer" class="keepDetail" style="display: none">
+                    <form action="/keep" method="POST">
+                        <input type="hidden" name="transfer" value="transfer" />
+                        <input type="hidden" id="dtp_input_transfer" name="datetime" value="" />
+                        <div class="board accountPanel clearfix">
+                            <div class="fleft">
+                                <span class="fleft">转出</span>
+                                <a type="button" name="dialogOut" class="btn fleft" data-toggle="modal" data-target="#myAccountDialog" onclick="addAccountLock(this);"></a>
+                                <input type="hidden" name="parentAccountContentOut" class="parentAccountContent" value="">
+                                <input type="hidden" name="subAccountContentOut" class="subAccountContent" value="">
+                            </div>
+                            <div class="fright">
+                                <span class="fright">转入</span>
+                                <a type="button" name="dialogIn" class="btn fright" data-toggle="modal" data-target="#myAccountDialog" onclick="addAccountLock(this);"></a>
+                                <input type="hidden" name="parentAccountContentIn" class="parentAccountContent" value="">
+                                <input type="hidden" name="subAccountContentIn" class="subAccountContent" value="">
+                            </div>
+                        </div>
+                        <div class="board">
+                            <fieldset disabled>
+                                <div class="input-group customMargin date form_datetime" data-date="" data-date-format="MMdd yyyy - hh:ii" data-link-field="dtp_input_transfer">
+                                    <input class="form-control" size="16" type="text" value="" readonly>
+                                    <span class="input-group-addon"><span class="glyphicon glyphicon-th"></span></span>
+                                </div>
+                            </fieldset>
+                            <div class="has-feedback">
+                                <input type="number" min="0.01" step="0.01" class="customMargin form-control" name="item_amount" placeholder="请输入金额(00.00)" onkeyup="checkNumber(this);countNumber(this);" />
+                                <span class="glyphicon glyphicon-ok form-control-feedback" aria-hidden="true" />
+                            </div>
+                            <textarea rols="2" class="form-control" placeholder="备注" name="item_note"></textarea>
+                        </div>
+                        <div id="transfer_confirm">
+                            <button type="submit" class="btn btn-warning col-md-4 col-md-offset-1 col-xs-4 col-xs-offset-1" name="save">保存</button>
+                            <button type="submit" class="btn btn-default col-md-4 col-md-offset-2 col-xs-4 col-xs-offset-2" name="nextKeep">再记一笔</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="myAccountDialog" class="modal fade" role="dialog">
+        <div class="modal-dialog modal-sm">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">账户选择</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="container-fluid">
+                        <div class="form-group">
+                            <select id="parentAccounts" class="form-control">
+                            </select>
+                            <select id="subAccounts" class="form-control">
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal" onclick="updateLockAfterChangeAccount();">确认</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="myCategoryDialog" class="modal fade" role="dialog">
+        <div class="modal-dialog modal-sm">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">分类选择</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="container-fluid">
+                        <div class="form-group">
+                            <select id="parentCategory" class="form-control">
+                            </select>
+                            <select id="subCategory" class="form-control">
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal" onclick="updateLockAfterChangeCategory();">确认</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
+<script src="/javascripts/jquery.min.js" type="text/javascript"></script>
+<script src="/javascripts/bootstrap.min.js" type="text/javascript"></script>
+<script src="/javascripts/custom.js" type="text/javascript"></script>
+<script src="/javascripts/bootstrap-datetimepicker.min.js" type="text/javascript"></script>
+<script src="/javascripts/bootstrap-datetimepicker.zh-CN.js" type="text/javascript"></script>
+<script type="text/javascript">
+let accountDatas = JSON.parse('<%= accountDatas %>'.replace(/&#34;/g, '\"'));
+let outlayCategoryDatas = JSON.parse('<%= outlayCategoryDatas %>'.replace(/&#34;/g, '\"'));
+let outlayDefaultCategory = '<%= outlayDefaultCategory %>';
+let outlayDefaultAccount = '<%= outlayDefaultAccount %>';
+let incomeCategoryDatas = JSON.parse('<%= incomeCategoryDatas %>'.replace(/&#34;/g, '\"'));
+let incomeDefaultCategory = '<%= incomeDefaultCategory %>';
+let incomeDefaultAccount = '<%= incomeDefaultAccount %>';
+let transferOutAccount = outlayDefaultAccount;
+let transferInAccount = incomeDefaultAccount;
+let itemIndex = 0;
+$(function() {
+    $('nav a').click(function() {
+        let href = $(this).attr('href');
+        $('nav ul').children().removeClass('active');
+        $(`[href='${href}']`).parent().addClass('active');
+        $('.keepDetail').hide();
+        $(`${href}`).show();
+        if (href == "#outlay") {
+            initByData(null, outlayCategoryDatas);
+        } else if (href == "#income") {
+            initByData(null, incomeCategoryDatas);
+        }
+    });
+
+    initByData(accountDatas, outlayCategoryDatas);
+
+    //init outlay data
+    addOutlayItem();
+    removeCategoryLockClass();
+    let DefaultAccountDatas = outlayDefaultAccount.split('/');
+    $('#outlay [data-target="#myAccountDialog"]').html(DefaultAccountDatas[1]);
+    $('#outlay [class="parentAccountContent"]').val(DefaultAccountDatas[0]);
+    $('#outlay [class="subAccountContent"]').val(DefaultAccountDatas[1]);
+    $('#outlay [data-target="#myCategoryDialog"]').html(outlayDefaultCategory);
+    $('#outlay [class="categoryContent"]').val(outlayDefaultCategory);
+
+    //init income data
+    DefaultAccountDatas = incomeDefaultAccount.split('/');
+    $('#income [data-target="#myAccountDialog"]').html(DefaultAccountDatas[1]);
+    $('#income [class="parentAccountContent"]').val(DefaultAccountDatas[0]);
+    $('#income [class="subAccountContent"]').val(DefaultAccountDatas[1]);
+    $('#income [data-target="#myCategoryDialog"]').html(incomeDefaultCategory);
+    $('#income [class="categoryContent"]').val(incomeDefaultCategory);
+
+    //init transfer data
+    DefaultAccountDatas = transferOutAccount.split('/');
+    $('#transfer [name="dialogOut"]').html(DefaultAccountDatas[1]);
+    $('#transfer [name="parentAccountContentOut"]').val(DefaultAccountDatas[0]);
+    $('#transfer [name="subAccountContentOut"]').val(DefaultAccountDatas[1]);
+    DefaultAccountDatas = transferInAccount.split('/');
+    $('#transfer [name="dialogIn"]').html(DefaultAccountDatas[1]);
+    $('#transfer [name="parentAccountContentIn"]').val(DefaultAccountDatas[0]);
+    $('#transfer [name="subAccountContentIn"]').val(DefaultAccountDatas[1]);
+
+    //设置时间选择器
+    $('.form_datetime').datetimepicker({
+        //language:  'fr',
+        language: 'zh-CN',
+        weekStart: 1,
+        todayBtn: 1,
+        autoclose: 1,
+        todayHighlight: 1,
+        startView: 2,
+        forceParse: 0,
+        minuteStep: 5, //分钟间隔
+        showMeridian: 1
+    });
+    $(".form_datetime").datetimepicker('setDate', new Date());
+
+    $("form").submit(function(e) {
+        let parentId = $(this).parent().prop('id');
+        if (parentId === 'transfer' || parentId === 'outlay' || parentId === 'income') {
+            // if ($(`#${parentId} input[type="number"]`).length === 0) {
+            //     e.preventDefault();
+            //     alert('请至少保留一项数据');
+            //     return;
+            // }
+            $(`#${parentId} input[type="number"]`).each(function() {
+                if ($(this).val().length == 0) {
+                    e.preventDefault();
+                    $(this).focus();
+                    alert('请输入金额');
+                    return;
+                }
+            });
+            if (parentId === 'transfer') {
+                if ($('#transfer [name="subAccountContentOut"]').val() == $('#transfer [name="subAccountContentIn"]').val()) {
+                    e.preventDefault();
+                    alert('输出账户不能和输入账户相同');
+                    return;
+                }
+            }
+
+        } else {
+            e.preventDefault();
+            alert("Submit prevented");
+        }
+    });
+});
+
+function initByData(AccountDatas, CategoryDatas) {
+    //读取账户数据
+    if (AccountDatas != null) {
+        $('#parentAccounts').empty();
+        $.each(AccountDatas, function(index, value) {
+            $('#parentAccounts').append(`<option value='${index}'>${value.val}</option>`);
+        });
+
+        $('#parentAccounts').change(function() {
+            let sub = AccountDatas[this.value].sub;
+            $('#subAccounts').empty();
+            $.each(sub, function(index, value) {
+                $('#subAccounts').append(`<option value='${value.val}'>${value.val} [\$${value.balance}]</option>`);
+            });
+        });
+        $('#parentAccounts').change();
+    }
+
+    //读取消费分类数据
+    if (CategoryDatas != null) {
+        $('#parentCategory').empty();
+        $.each(CategoryDatas, function(index, value) {
+            $('#parentCategory').append(`<option value='${index}'>${value.val}</option>`);
+        });
+
+        $('#parentCategory').change(function() {
+            let sub = CategoryDatas[this.value].sub;
+            $('#subCategory').empty();
+            $.each(sub, function(index, value) {
+                $('#subCategory').append(`<option value='${value}'>${value}</option>`);
+            });
+        });
+        $('#parentCategory').change();
+    }
+}
+
+// function initByData(AccountDatas, DefaultAccount, CategoryDatas, DefaultCategory) {
+//     //读取账户数据
+//     if (AccountDatas != null && DefaultAccount != null) {
+//         let DefaultAccountDatas = DefaultAccount.split('/');
+//         $('#parentAccounts').empty();
+//         $.each(AccountDatas, function(index, value) {
+//             let selected = DefaultAccountDatas[0] == value.val ? 'selected' : '';
+//             $('#parentAccounts').append(`<option text='${value.val}' value='${index}' ${selected}>${value.val}</option>`);
+//         });
+
+//         $('#parentAccounts').change(function() {
+//             let sub = AccountDatas[this.value].sub;
+//             $('#subAccounts').empty();
+//             $.each(sub, function(index, value) {
+//                 let selected = DefaultAccountDatas[1] == value ? 'selected' : '';
+//                 $('#subAccounts').append(`<option value='${index}' ${selected}>${value}</option>`);
+//             });
+//         });
+//         $('#parentAccounts').change();
+//     }
+
+//     //读取消费分类数据
+//     if (CategoryDatas != null && DefaultCategory != null) {
+//         $('#parentCategory').empty();
+//         let DefaultCategoryDatas = DefaultCategory.split('/');
+//         $.each(CategoryDatas, function(index, value) {
+//             let selected = DefaultCategoryDatas[0] == value.val ? 'selected' : '';
+//             $('#parentCategory').append(`<option text='${value.val}' value='${index}' ${selected}>${value.val}</option>`);
+//         });
+
+//         $('#parentCategory').change(function() {
+//             let sub = CategoryDatas[this.value].sub;
+//             $('#subCategory').empty();
+//             $.each(sub, function(index, value) {
+//                 let selected = DefaultCategoryDatas[1] == value ? 'selected' : '';
+//                 $('#subCategory').append(`<option value='${index}' ${selected}>${value}</option>`);
+//             });
+//         });
+//         $('#parentCategory').change();
+//     }
+// }
+
+function useLockResetAccount() {
+    if ($('.accountLock').length == 0) return;
+    let parentAccountValue = $('.accountLock').parent().children(`input[ class="parentAccountContent"]`).val();
+    let subAccountValue = $('.accountLock').parent().children(`input[class="subAccountContent"]`).val();
+
+    $("#parentAccounts option").filter(function() {
+        return $(this).text() == parentAccountValue;
+    }).prop('selected', true);
+    $('#parentAccounts').change();
+    $("#subAccounts").find(`option[value='${subAccountValue}']`).prop("selected", true);
+    removeAccountLockClass();
+}
+
+function updateLockAfterChangeAccount() {
+    if ($('.accountLock').length == 0) return;
+    let parentAccountValue = $('#parentAccounts').find("option:selected").text();
+    let subAccountValue = $('#subAccounts').find("option:selected").prop("value");
+
+    $('.accountLock').html(`${subAccountValue}`);
+    $('.accountLock').parent().children(`input[class="parentAccountContent"]`).val(`${parentAccountValue}`);
+    $('.accountLock').parent().children(`input[class="subAccountContent"]`).val(`${subAccountValue}`);
+    removeAccountLockClass();
+}
+
+function useLockResetCategory() {
+    if ($('.categoryLock').length == 0) return;
+    let categoryContents = $('.categoryLock').html().split('/');
+    let categoryValue = categoryContents[0];
+    let subCategoryValue = categoryContents[1];
+
+    $("#parentCategory option").filter(function() {
+        return $(this).text() == categoryValue;
+    }).prop('selected', true);
+    $('#parentCategory').change();
+    $("#subCategory").find(`option[value='${subCategoryValue}']`).prop("selected", true);
+    removeCategoryLockClass();
+}
+
+function updateLockAfterChangeCategory() {
+    if ($('.categoryLock').length == 0) return;
+    let categoryValue = $('#parentCategory').find("option:selected").text();
+    let subCategoryValue = $('#subCategory').find("option:selected").text();
+    $('.categoryLock').html(`${categoryValue}/${subCategoryValue}`);
+    $('.categoryLock').parent().children('input[type="hidden"]').val(`${categoryValue}/${subCategoryValue}`);
+    removeCategoryLockClass();
+}
+
+function addAccountLockClass(obj) {
+    $(obj).addClass('accountLock');
+}
+
+function removeAccountLockClass() {
+    $('.accountLock').removeClass('accountLock');
+}
+
+function addAccountLock(obj) {
+    removeAccountLockClass();
+    addAccountLockClass(obj);
+    useLockResetAccount();
+    addAccountLockClass(obj);
+}
+
+function addCategoryLockClass(obj) {
+    $(obj).addClass('categoryLock');
+}
+
+function removeCategoryLockClass() {
+    $('.categoryLock').removeClass('categoryLock');
+}
+
+function addCategoryLock(obj) {
+    removeCategoryLockClass();
+    addCategoryLockClass(obj);
+    useLockResetCategory();
+    addCategoryLockClass(obj);
+}
+
+function addOutlayItem() {
+    $('#outlay_confirm').before(`<div class="board categoryPanel">
+                            <span>分类</span>
+                            <input type="hidden" class="categoryContent" name="item${itemIndex}_category" value=""/ >
+                            <a type="button" class="btn categoryLock" data-toggle="modal" data-target="#myCategoryDialog" onclick="addCategoryLock(this)"></a>
+                            <button type="button" class="btn btn-info" onclick="deleteOutlayItem(this)">删除此项</button>
+                            <div class="has-feedback">
+                                <input type="number" min="0.01" step="0.01" class="customMargin form-control" name="item${itemIndex}_amount" placeholder="请输入金额(00.00)" onkeyup="checkNumber(this);countNumber(this);" />
+                                <span class="glyphicon glyphicon-ok form-control-feedback" aria-hidden="true"/>
+                            </div>
+                            <textarea rols="2" class="form-control" placeholder="备注" name="item${itemIndex}_note"></textarea>
+                        </div>`);
+    itemIndex++;
+    updateLockAfterChangeCategory();
+    if ($('#outlay [onclick="deleteOutlayItem(this)"]').length <= 1) {
+        $('#outlay [onclick="deleteOutlayItem(this)"]').prop("disabled", true);
+    } else {
+        $('#outlay [onclick="deleteOutlayItem(this)"]').prop("disabled", false);
+    }
+}
+
+function deleteOutlayItem(btn) {
+    $(btn).parents('.categoryPanel').remove();
+    if ($('#outlay [onclick="deleteOutlayItem(this)"]').length <= 1) {
+        $('#outlay [onclick="deleteOutlayItem(this)"]').prop("disabled", true);
+    } else {
+        $('#outlay [onclick="deleteOutlayItem(this)"]').prop("disabled", false);
+    }
+}
+
+function countNumber(obj) {
+    let number = Number(0);
+    $('.has-feedback.has-success input').each(function() {
+        number += Number($(this).val());
+    });
+
+    $('#input_integer').val(Math.floor(number));
+    $('#input_decimal').val(Math.round((number - Math.floor(number)) * 100));
+}
+</script>

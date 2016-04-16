@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>
+        <%= title %>
+    </title>
+    <link rel="stylesheet" type="text/css" href="/stylesheets/bootstrap.min.css" />
+    <link rel="stylesheet" type="text/css" href="/stylesheets/style.css" />
+</head>
+
+<body onkeydown="backspace();">
+    <div class="container">
+        <div class="form-group">
+            <div class="col-md-6 col-md-offset-3 col-xs-12">
+                <div class="navbar-form" role="search">
+                    <input type="text" class="form-control" placeholder="请输入过滤信息" />
+                    <button id="filter" type="button" class="btn btn-default">确认过滤</button>
+                    <a href="/" class="navbar-right btn btn-link">返回首页</a>
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-md-6 col-md-offset-3 col-xs-12" id="history">
+                <div class="board dayPanel clearfix">
+                    <label>4月15日</label>
+                    <span class="total">总计:-10.00</span>
+                    <span class="outlay">支出:10.00</span>
+                    <span class="income">收入:0.00</span>
+                    <div class="col-md-10 col-xs-10 billPanel">
+                        <label class="fleft account">Kiwi消费卡</label>
+                        <span class="outlay account">10.00</span>
+                        <span class="fleft">食品原材料|测试数据</span>
+                        <span class="fright outlay">10.00</span>
+                        <span class="fleft">食品原材料|测试数据</span>
+                        <span class="fright outlay">10.00</span>
+                    </div>
+                    <div class="col-md-10 col-xs-10 billPanel">
+                        <label class="fleft account">Kiwi消费卡</label>
+                        <span class="outlay account">10.00</span>
+                        <span class="fleft">食品原材料|测试数据</span>
+                        <span class="fright outlay">10.00</span>
+                        <span class="fleft">食品原材料|测试数据</span>
+                        <span class="fright outlay">10.00</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
+<script src="/javascripts/jquery.min.js" type="text/javascript"></script>
+<script src="/javascripts/custom.js" type="text/javascript"></script>
+<script type="text/javascript">
+let days = JSON.parse('<%= days %>'.replace(/&#34;/g, '\"'));
+$(function() {
+    $.each(days, function(index, day) {
+        let dayPanel = `<div class="board dayPanel clearfix">
+                    <label>${day[0]}</label>
+                    <span class="total">总计:${day[1].income - day[1].outlay}</span>
+                    <span class="outlay">支出:${day[1].outlay}</span>
+                    <span class="income">收入:${day[1].income}</span>`;
+        $.each(day[1].bills, function(index, bill) {
+            dayPanel += `<div class="col-md-10 col-xs-10 billPanel">`;
+            if (bill.accountin.name == null) {
+                dayPanel += `<label class="fleft account">${bill.accountout.name}&nbsp;&nbsp;[<a>编辑</a>&nbsp;&nbsp;<a>删除</a>]</label>
+                            <span class="outlay account">${bill.amount}</span>`;
+            } else if (bill.accountout.name == null) {
+                dayPanel += `<label class="fleft account">${bill.accountin.name}&nbsp;&nbsp;[<a>编辑</a>&nbsp;&nbsp;<a>删除</a>]</label>
+                            <span class="income account">${bill.amount}</span>`;
+            } else {
+                dayPanel += `<label class="fleft account">${bill.accountout.name} -> ${bill.accountin.name}&nbsp;&nbsp;[<a>编辑</a>&nbsp;&nbsp;<a>删除</a>]</label>
+                            <span class="transfer account">${bill.amount}</span>`;
+            }
+            $.each(bill.item, function(index, item) {
+                if (bill.accountin.name == null) {
+                    dayPanel += `<span class="fleft">${item.category.name}|${item.note}</span>
+                        <span class="fright outlay">${item.amount}</span>`;
+                } else if (bill.accountout.name == null) {
+                    dayPanel += `<span class="fleft">${item.category.name}|${item.note}</span>
+                        <span class="fright income">${item.amount}</span>`;
+                }
+            });
+            dayPanel += `</div>`;
+        });
+        dayPanel += `</div>`;
+        $('#history').append(dayPanel);
+    });
+});
+</script>
