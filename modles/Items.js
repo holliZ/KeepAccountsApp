@@ -57,26 +57,30 @@ class Items {
                 }
 
                 let dayMap = new Map();
+                let income = Number(0);
+                let outlay = Number(0);
                 for (let bill of billsMap.values()) {
                     let date = new Date(bill.time);
-                    let dateKey = `${date.getMonth() + 1}月${date.getDate()}日`;
-                    if (!dayMap.has(dateKey)) {
-                        dayMap.set(dateKey, {
+                    let dayKey = `${date.getMonth() + 1}月${date.getDate()}日`;
+                    if (!dayMap.has(dayKey)) {
+                        dayMap.set(dayKey, {
                             income:Number(0),
                             outlay:Number(0),
                             bills : []
                         });
                     }
                     if (bill.type == 'outlay') {
-                        dayMap.get(dateKey).outlay += Number(bill.amount);
+                        dayMap.get(dayKey).outlay += Number(bill.amount);
+                        outlay += Number(bill.amount);
                     } else if(bill.type == 'income'){
-                        dayMap.get(dateKey).income += Number(bill.amount);
+                        dayMap.get(dayKey).income += Number(bill.amount);
+                        income += Number(bill.amount);
                     }
-                    dayMap.get(dateKey).bills.push(bill);
+                    dayMap.get(dayKey).bills.push(bill);
                 }
 
                 console.log('invoked[Items.getConnectionAll]');
-                callback(err, JSON.stringify(Array.from(dayMap.entries())));
+                callback(err, income, outlay, JSON.stringify(Array.from(dayMap.entries())));
             } finally {
                 if (Items.pool._freeConnections.indexOf(Items.connection) == -1) {
                     Items.connection.release();

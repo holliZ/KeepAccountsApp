@@ -22,10 +22,9 @@ class Bill {
         obj = obj || {};
         let itemObj = {
             note: obj.note,
-            amount: Number(obj.amount).toFixed(2),
+            amount: Number(obj.amount),
         };
         this.billObj.billAmount += Number(obj.amount);
-        this.billObj.billAmount = this.billObj.billAmount.toFixed(2);
         if (obj.category) {
             let datas = obj.category.split('/');
             if (datas.length == 2) {

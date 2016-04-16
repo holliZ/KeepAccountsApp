@@ -44,27 +44,27 @@ nav {
     color: gray;
 }
 
-.dayPanel .income {
+.income {
     font-size: 110%;
     margin-left: 8%;
     float: right;
     color: green;
 }
 
-.dayPanel .outlay {
+.outlay {
     font-size: 110%;
     margin-left: 8%;
     float: right;
     color: red;
 }
 
-.dayPanel .transfer{
+.transfer{
     font-size: 110%;
     margin-left: 8%;
     float: right;
 }
 
-.dayPanel .total {
+.total {
     font-size: 110%;
     margin-left: 8%;
     float: right;
