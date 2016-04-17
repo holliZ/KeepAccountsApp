@@ -117,6 +117,8 @@ CREATE TABLE `billlist` (
   PRIMARY KEY (`Id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+INSERT INTO `billlist` VALUES (1,'','2016-04-16 18:37:35',6,NULL,3.00,'outlay'),(2,'','2016-04-16 18:37:47',NULL,1,100.00,'income'),(3,'','2016-04-16 18:37:59',1,6,100.00,'transfer'),(4,'','2016-04-15 20:35:26',6,NULL,5.00,'outlay');
+
 CREATE TABLE `itemlist` (
   `Id` int(11) NOT NULL AUTO_INCREMENT,
   `billid` int(11) NOT NULL DEFAULT '0',
@@ -126,6 +128,8 @@ CREATE TABLE `itemlist` (
   PRIMARY KEY (`Id`),
   CONSTRAINT `withbill` FOREIGN KEY (`billid`) REFERENCES `billlist` (`Id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+INSERT INTO `itemlist` VALUES (1,1,4,'test',1.00),(2,1,1,'test',2.00),(3,2,51,'test',100.00),(4,3,0,'test',100.00),(5,4,4,'测试昨天的数据',5.00);
 
 drop procedure IF EXISTS addOutlayBill;
 CREATE PROCEDURE addOutlayBill(in agroup VARCHAR(64),in aname VARCHAR(64),in btime datetime, in mount float(11,2), out billid int)
