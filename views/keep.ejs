@@ -44,7 +44,6 @@
                             <a type="button" class="btn" data-toggle="modal" data-target="#myAccountDialog" onclick="addAccountLock(this)"></a>
                             <input type="hidden" name="parentAccountContent" class="parentAccountContent" value="">
                             <input type="hidden" name="subAccountContent" class="subAccountContent" value="">
-                            <button type="button" class="btn btn-info" onclick="addOutlayItem()">增加一项</button>
                             <fieldset disabled>
                                 <div class="input-group customMargin date form_datetime" data-date="" data-date-format="MMdd yyyy - hh:ii" data-link-field="dtp_input_outlay">
                                     <input class="form-control" size="16" type="text" value="" readonly>
@@ -58,7 +57,10 @@
                                 </div>
                             </fieldset>
                         </div>
-                        <div id="outlay_confirm">
+                        <div id="outlay_add_item" class="board">
+                            <button type="button" class="btn btn-info btn-block" onclick="addOutlayItem()">增加一项</button>
+                        </div>
+                        <div id="outlay_confirm" class="clearfix board" style="border-bottom:none;">
                             <button type="submit" class="btn btn-warning col-md-4 col-md-offset-1 col-xs-4 col-xs-offset-1" name="save">保存</button>
                             <button type="submit" class="btn btn-default col-md-4 col-md-offset-2 col-xs-4 col-xs-offset-2" name="nextKeep">再记一笔</button>
                         </div>
@@ -447,7 +449,7 @@ function addCategoryLock(obj) {
 }
 
 function addOutlayItem() {
-    $('#outlay_confirm').before(`<div class="board categoryPanel">
+    $('#outlay_add_item').before(`<div class="board categoryPanel">
                             <span>分类</span>
                             <input type="hidden" class="categoryContent" name="item${itemIndex}_category" value=""/ >
                             <a type="button" class="btn categoryLock" data-toggle="modal" data-target="#myCategoryDialog" onclick="addCategoryLock(this)"></a>
